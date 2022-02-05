@@ -6,9 +6,9 @@ $pages = @()
 $pages += New-udpage -name 'AD Group Lookup & Export' -HeaderColor 'black' -HeaderBackgroundColor 'LightBlue' -content {
     $groups = (get-adgroup -filter * | Select-Object -expandproperty samaccountname)
 
-    New-UDAutocomplete  -Options @($groups | Sort-Object) -label "í´Ž Search Groups" -id "GroupSelect" -variant outlined
-    New-UDCheckbox -Id 'MailCheck' -Label 'í³§ Include Email Addresses? (Slower on larger groups)'
-    New-UDButton -Text 'í±¥ Show Users' -OnClick {
+    New-UDAutocomplete  -Options @($groups | Sort-Object) -label "ðŸ”Ž Search Groups" -id "GroupSelect" -variant outlined
+    New-UDCheckbox -Id 'MailCheck' -Label 'ðŸ“§ Include Email Addresses? (Slower on larger groups)'
+    New-UDButton -Text 'ðŸ‘¥ Show Users' -OnClick {
         Sync-UDElement -Id 'GroupDisplay'
         Sync-UDElement -Id 'MailCheck'
     }
@@ -60,7 +60,7 @@ $pages += New-udpage -name 'AD Group Lookup & Export' -HeaderColor 'black' -Head
         $depts = ($depts).toUpper()
         $uDepts = ($depts | get-unique)
     
-        New-UDAutocomplete  -Options @($uDepts | Sort-Object) -label "í´Ž Search Departments" -id "DeptSelect" -variant outlined
+        New-UDAutocomplete  -Options @($uDepts | Sort-Object) -label "ðŸ”Ž Search Departments" -id "DeptSelect" -variant outlined
         New-UDCheckbox -Id 'MailCheck' -Label 'Include Email Addresses? (Slower on larger groups)'
         New-UDButton -Text 'Show Users' -OnClick {
             Sync-UDElement -Id 'DeptDisplay'
