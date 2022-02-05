@@ -61,7 +61,7 @@ $pages += New-udpage -name 'AD Group Lookup & Export' -HeaderColor 'black' -Head
         $uDepts = ($depts | get-unique)
     
         New-UDAutocomplete  -Options @($uDepts | Sort-Object) -label "🔎 Search Departments" -id "DeptSelect" -variant outlined
-        New-UDCheckbox -Id 'MailCheck' -Label 'Include Email Addresses? (Slower on larger groups)'
+        New-UDCheckbox -Id 'MailCheck' -Label 'Include Email Addresses?'
         New-UDButton -Text 'Show Users' -OnClick {
             Sync-UDElement -Id 'DeptDisplay'
             Sync-UDElement -Id 'MailCheck'
@@ -109,3 +109,4 @@ $pages += New-udpage -name 'AD Group Lookup & Export' -HeaderColor 'black' -Head
 
 
     New-UDDashboard -Title 'AD Tools' -pages $pages
+    
