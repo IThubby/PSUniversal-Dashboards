@@ -3,10 +3,10 @@ $pages = @()
 #####################################
 # AD Group Lookup
 #####################################
-$pages += New-udpage -name 'AD Group Lookup & Export' -HeaderColor 'black' -HeaderBackgroundColor 'LightBlue' -content {
+$pages += New-UDPage -Name 'AD Group Lookup & Export' -HeaderColor 'black' -HeaderBackgroundColor 'LightBlue' -Content {
     $groups = (get-adgroup -filter * | Select-Object -expandproperty samaccountname)
 
-    New-UDAutocomplete  -Options @($groups | Sort-Object) -label "🔎 Search Groups" -id "GroupSelect" -variant outlined
+    New-UDAutocomplete  -Options @($groups | Sort-Object) -Label "🔎 Search Groups" -Id "GroupSelect" -variant outlined
     New-UDCheckbox -Id 'MailCheck' -Label '📧 Include Email Addresses? (Slower on larger groups)'
     New-UDButton -Text '👥 Show Users' -OnClick {
         Sync-UDElement -Id 'GroupDisplay'
@@ -15,21 +15,21 @@ $pages += New-udpage -name 'AD Group Lookup & Export' -HeaderColor 'black' -Head
     
 
 
-    New-UDDynamic -id 'GroupDisplay' -Content {
+    New-UDDynamic -Id 'GroupDisplay' -Content {
        
-        $ADGroup = ((Get-UDElement -id 'GroupSelect').value)
-        $ADGroupCheck = $(try { get-adgroup $ADGroup} catch { $null })
+        $ADGroup = ((Get-UDElement -Id 'GroupSelect').value)
+        $ADGroupCheck = $(try { Get-ADGroup $ADGroup} catch { $null })
         $Mailcheck = ((Get-UDElement -Id 'MailCheck').checked)
         
         if ($ADGroupcheck -ne $null) {
             
-            $GroupPath = (get-adgroup -properties canonicalname $ADGroup).canonicalname
+            $GroupPath = (Get-ADGroup -properties canonicalname $ADGroup).canonicalname
             New-UDHtml -markup "<br>"
             New-UDCard -Title "Group Info - Located: $GroupPath"  -Content {
                 New-UDIcon -Icon 'Address_Book' -Size '5x' -Border
                 $Columns = @(
-                    New-UDTableColumn -property samaccountname -title "Username" -includeinsearch -IncludeInExport
-                    New-UDTableColumn -property name -title "Name" -includeinsearch -IncludeInExport
+                    New-UDTableColumn -property samaccountname -title "Username" -IncludeInSearch -IncludeInExport
+                    New-UDTableColumn -property name -title "Name" -IncludeInSearch -IncludeInExport
                     New-UDTableColumn -property Email -title "Email" -IncludeInExport
                 )
                 $data = if ($mailcheck -eq $true) {
@@ -60,7 +60,7 @@ $pages += New-udpage -name 'AD Group Lookup & Export' -HeaderColor 'black' -Head
         $depts = ($depts).toUpper()
         $uDepts = ($depts | get-unique)
     
-        New-UDAutocomplete  -Options @($uDepts | Sort-Object) -label "🔎 Search Departments" -id "DeptSelect" -variant outlined
+        New-UDAutocomplete  -Options @($uDepts | Sort-Object) -label "🔎 Search Departments" -Id "DeptSelect" -variant outlined
         New-UDCheckbox -Id 'MailCheck' -Label 'Include Email Addresses?'
         New-UDButton -Text 'Show Users' -OnClick {
             Sync-UDElement -Id 'DeptDisplay'
@@ -69,9 +69,9 @@ $pages += New-udpage -name 'AD Group Lookup & Export' -HeaderColor 'black' -Head
         
     
     
-        New-UDDynamic -id 'DeptDisplay' -Content {
+        New-UDDynamic -Id 'DeptDisplay' -Content {
            
-            $ADDept = ((Get-UDElement -id 'DeptSelect').value)
+            $ADDept = ((Get-UDElement -Id 'DeptSelect').value)
             $ADDeptCheck = $(try { Get-ADUser -filter {department -eq $ADDept}} catch { $null })
             $Mailcheck = ((Get-UDElement -Id 'MailCheck').checked)
             if ($ADDeptCheck -ne $null) {
@@ -87,10 +87,10 @@ $pages += New-udpage -name 'AD Group Lookup & Export' -HeaderColor 'black' -Head
                         New-UDTableColumn -property mail -title "Email" -IncludeInExport
                     )
                     $data = if ($mailcheck -eq $true) {
-                        get-ADUser -filter * -properties department,title,mail | ? department -eq $ADDept | sort samaccountname | select  samaccountname, name, title, enabled, mail
+                        get-ADUser -filter * -properties department,title,mail | ? department -eq $ADDept | sort samaccountname | select  samaccountname, name, title, @{n= "enabled" ; e = {if ($_.enabled) {"True"} else {"False"}}}, mail
                     }
                     else {
-                        get-ADUser -filter * -properties department,title | ? department -eq $ADDept | sort samaccountname | select  samaccountname, name, title, enabled
+                        get-ADUser -filter * -properties department,title | ? department -eq $ADDept | sort samaccountname | select  samaccountname, name, title, @{n= "enabled" ; e = {if ($_.enabled) {"True"} else {"False"}}}
                     }
                 
                     New-UDTable -data $data -columns $columns -title "$ADDept Department Members" -showsort -showsearch -dense -export -paging -pagesize 25
@@ -109,4 +109,3 @@ $pages += New-udpage -name 'AD Group Lookup & Export' -HeaderColor 'black' -Head
 
 
     New-UDDashboard -Title 'AD Tools' -pages $pages
-    
